@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+git "https://github.com/rails/rails.git", branch: "main" do
+  gem "activerecord"
+  gem "railties"
+end
+gem "pg"
+gem "rubocop", "~> 1.21"
+gem "sqlite3", ">= 2.1"

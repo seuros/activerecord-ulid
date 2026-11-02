@@ -7,3 +7,4 @@
 /spec/reports/
 /test/dummy/tmp/
 /test/dummy/log/
+/gemfiles/*.lock

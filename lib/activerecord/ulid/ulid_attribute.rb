@@ -12,13 +12,18 @@ class ULIDAttribute < ActiveRecord::Type::String
     super()
   end
 
+  def generate
+    [prefix, ULID.generate].compact.join
+  end
+
+  def generates_default?
+    initial && !nullable
+  end
+
   def cast(value)
-    return value if value.present?
-    return if value.nil? && nullable
+    return value unless value.nil?
+    return unless generates_default?
 
-    value = ULID.generate if value.nil? && initial
-    return value if value.empty?
-
-    [prefix, value].compact.join
+    generate
   end
 end
