@@ -1,40 +1,32 @@
-name: Ruby test
+name: CI
 
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
   pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }} ${{ matrix.gemfile }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: seuros/setup-dictator@master
+      - run: dictator lint .
+
+  test:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }} @ Rails ${{ matrix.rails }}
     strategy:
       fail-fast: false
       matrix:
-        ruby:
-          - '3.0'
-          - '3.1'
-          - '3.2'
-          - '3.3'
-        gemfile:
-          - Gemfile
-        include:
-          - ruby: '3.4'
-            gemfile: gemfiles/rails_8_1.gemfile
-          - ruby: '4.0'
-            gemfile: gemfiles/rails_edge.gemfile
+        ruby: ['4.0']
+        rails: ['~> 8.1.0', 'edge']
     env:
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
-
+      RAILS_VERSION: ${{ matrix.rails }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
-    - name: Run the default task
-      run: bin/rails db:reset && bin/rails test
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - run: bundle exec rake test

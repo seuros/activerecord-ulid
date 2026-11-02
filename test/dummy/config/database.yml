@@ -1,4 +1,4 @@
 test:
-  url: <%= ENV.fetch('DATABASE_URL', "sqlite3://#{Rails.root.join('tmp')}/with_advisory_lock-#{Rails.gem_version}-#{RUBY_VERSION}.sqlite3") %>
-  properties:
-    allowPublicKeyRetrieval: true
+  adapter: sqlite3
+  database: tmp/test.sqlite3
+  timeout: 5000

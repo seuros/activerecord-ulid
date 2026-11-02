@@ -1,39 +1,55 @@
-# Activerecord::Ulid
+# activerecord-ulid
 
+A `:ulid` attribute type for Active Record. Every record gets its own
+[ULID](https://github.com/ulid/spec) the moment it's built: sortable, unique,
+and readable in a URL.
+
+Requires Ruby 4.0+ and Active Record 8.1+.
 
 ## Installation
 
-Add this gem to your Gemfile:
-
 ```ruby
-gem 'activerecord-ulid'
+gem "activerecord-ulid"
 ```
-
-Then, run `bundle install`.
 
 ## Usage
 
-in your model:
+ULIDs live in string columns:
 
 ```ruby
-class User < ActiveRecord::Base
+create_table :users, id: :string do |t|
+  t.string :invite_code
+end
+
+class User < ApplicationRecord
   attribute :id, :ulid
 end
+
+User.new.id # => "01JBQ8Z3X4M6V2N9R7T5K1W0HD"
 ```
 
-you can add a prefix to the ulid:
+Prefix them, Stripe style:
 
 ```ruby
-
-class User < ActiveRecord::Base
-  attribute :id, :ulid, prefix: 'usr_'
-end
+attribute :id, :ulid, prefix: "usr_" # => "usr_01JBQ8Z3X4M6V2N9R7T5K1W0HD"
 ```
 
-## Contributing
+Options:
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/seuros/activerecord-ulid.
+- `prefix:` prepended to the ULID.
+- `nullable: true` (or `initial: false`) leaves `nil` alone: no ULID is generated.
+- `default:` given explicitly wins over the generated ULID.
+
+Assigning `nil` to a generating attribute gives it a fresh ULID.
+
+## Development
+
+```console
+$ bundle exec rake test                 # padded_cell, Rails 8.1
+$ RAILS_VERSION=edge bundle exec rake   # Rails main
+$ dictator lint .
+```
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+MIT. See [LICENSE.txt](LICENSE.txt).

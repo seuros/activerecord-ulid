@@ -15,22 +15,25 @@ module ActiveRecordULID
       assert_equal 31, user.id_card.length
       assert_equal 33, user.student_number.length
 
-      user = User.find(id)
-      assert_equal id, user.id
+      stored = User.find(id)
+      assert_equal [id, user.id_card, user.student_number], [stored.id, stored.id_card, stored.student_number]
 
+      # Updating another column leaves the ULIDs alone
+      assert stored.update(name: "test")
+      stored.reload
 
-      ## update name
-      user.name = "test"
-      assert user.save
+      assert_equal "test", stored.name
+      assert_equal [id, user.id_card, user.student_number], [stored.id, stored.id_card, stored.student_number]
+    end
 
-      assert_equal id, user.id
-      assert_equal "test", user.name
+    def test_type_instance_gets_a_per_record_default
+      model = Class.new(ApplicationRecord) do
+        self.table_name = "users"
+        attribute :id, ActiveRecordULID::Type.new(prefix: "usr_")
+      end
 
-      ## Nothing changed
-      assert_equal 26, id.length
-
-      assert_equal 31, user.id_card.length
-      assert_equal 33, user.student_number.length
+      assert model.new.id.start_with?("usr_")
+      assert_not_equal model.new.id, model.new.id
     end
 
     def test_each_new_record_gets_its_own_ulids
